@@ -1,5 +1,6 @@
 ﻿using ManagementEmployee.Entity;
 using ManagementEmployee.Interface;
+using ManagementEmployee.Repository.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
@@ -21,15 +22,15 @@ namespace ManagementEmployee.API.Controllers
 
         [HttpGet]
         [Route("api/employee")]
-        [Authorize]
+        [Authorize(Roles ="User")]
         public async Task<IActionResult> GetAllEmployeesAsync()
         {
             var employees = await _employeeService.GetAllEmployeesAsync();
             return Ok(employees);
         }
 
-        [HttpGet]
-        [Route("api/employee/{id}")]
+        [HttpGet("api/employee/{id}")]
+        [Authorize(Roles = "User")]
         [ProducesResponseType(200)]
         public async Task<IActionResult> GetEmployeeByIdAsync(int id)
         {
@@ -39,7 +40,7 @@ namespace ManagementEmployee.API.Controllers
 
         [HttpPost]
         [Route("api/employee")]
-        [Authorize]
+        [Authorize(Roles = "Manager")]
         [ProducesResponseType(200)]
         public async Task<IActionResult> AddEmployeeAsync([FromBody] EmployeeDTO employee)
         {
@@ -48,7 +49,7 @@ namespace ManagementEmployee.API.Controllers
         }
 
         [HttpPut]
-        [Authorize]
+        [Authorize(Roles = "Manager")]
         [Route("api/employee/{id}")]
         public async Task<IActionResult> UpdateEmployeeAsync(int id, [FromBody] EmployeeDTO employee)
         {
@@ -57,7 +58,7 @@ namespace ManagementEmployee.API.Controllers
         }
 
         [HttpDelete]
-        [Authorize]
+        [Authorize(Roles = "Admin,Manager")]
         [Route("api/employee/{id}")]
         public async Task<IActionResult> DeleteEmployeeAsync(int id)
         {
@@ -74,15 +75,17 @@ namespace ManagementEmployee.API.Controllers
             {
                 return Unauthorized(response.Message);
             }
+            var user = response.Data as Users;  // for role based authentication
             var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes("ThisismySecretKEYFORAuthentication!@%!@#$*&!@*#(7^#$(*&!@#$*^(!@#^$(*&!@#$(*&11234987+asjfl;aHFAJKD2139408-1==asdfjk;asd**&(*&asdfj;aklsjdflk;");
+            var key = Encoding.ASCII.GetBytes("!@%!@#$*&!@*#(7^#$(*&!@#$*^(!@#^$(*&!@#$(*&11234987+asjfl;aHFAJKD2139408-1==asdfjk;asd**&(*&asdfj;aklsjdflk;");
             var tokenDescriptor = new SecurityTokenDescriptor
             {
-                Subject = new ClaimsIdentity(new Claim[]
-                {
-                    new Claim(ClaimTypes.Name, loginRequest.Email)
-                }),
-                Expires = DateTime.UtcNow.AddMinutes(1),
+                Subject = new ClaimsIdentity(
+                [
+                    new Claim(ClaimTypes.Name, loginRequest.Email),
+                    new Claim(ClaimTypes.Role,user.Role) // role claim added for role base authentication
+                ]),
+                Expires = DateTime.UtcNow.AddMinutes(5),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
             };
             var token = tokenHandler.CreateToken(tokenDescriptor);
@@ -90,7 +93,5 @@ namespace ManagementEmployee.API.Controllers
             response.Data = tokenString;
             return Ok(response);
         }
-
-   
     }
 }

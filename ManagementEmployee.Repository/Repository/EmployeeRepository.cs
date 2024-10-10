@@ -8,8 +8,8 @@ namespace ManagementEmployee.Repository.Repository
 {
     public class EmployeeRepository : IEmployeeRepository
     {
-        private readonly EmployeeContext _context;
-        public EmployeeRepository(EmployeeContext context)
+        private readonly ApplicationDBContext _context;
+        public EmployeeRepository(ApplicationDBContext context)
         {
             _context = context;
         }
@@ -155,12 +155,13 @@ namespace ManagementEmployee.Repository.Repository
         }
         public Task<ResponseModel> Login(string email, string password)
         {
-            if (email == "admin@gmail.com" || password == "1234")
-            {
+            var user = _context.Users.Where(Users => Users.Email == email && Users.Password == password).FirstOrDefault();
+            if (user != null) {
                 return Task.FromResult(new ResponseModel
                 {
                     Success = true,
-                    Message = "Logged in Succesfully"
+                    Message = "Logged in Succesfully",
+                    Data = user
                 });
             }
             return Task.FromResult(new ResponseModel
