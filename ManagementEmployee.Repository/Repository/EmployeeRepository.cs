@@ -34,7 +34,7 @@ namespace ManagementEmployee.Repository.Repository
                 return new ResponseModel
                 {
                     Success = true,
-                    Data = EmpToADD.Id,
+                    Data = EmpToADD,
                     Message = "Employee Added successfully"
                 };
             }
@@ -142,7 +142,7 @@ namespace ManagementEmployee.Repository.Repository
             {
                 return new ResponseModel
                 {
-                    Data = EMP.Id,
+                    Data = EMP,
                     Success = true,
                     Message = "Employee Updated",
                 };

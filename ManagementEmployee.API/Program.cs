@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using System.Security.Claims;
+using ManagementEmployee.Repository.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -50,9 +51,12 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseMiddleware<ExceptionHandlingMiddleware>();
+
 app.UseAuthentication();// For jwt authentication
 
 app.UseAuthorization(); // For jwt role based authorization
+
 
 app.MapControllers();
 

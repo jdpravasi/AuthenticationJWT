@@ -44,8 +44,8 @@ namespace ManagementEmployee.API.Controllers
         [ProducesResponseType(200)]
         public async Task<IActionResult> AddEmployeeAsync([FromBody] EmployeeDTO employee)
         {
-            await _employeeService.AddEmployeeAsync(employee);
-            return Ok();
+           var response =  await _employeeService.AddEmployeeAsync(employee);
+            return Ok(response);
         }
 
         [HttpPut]
@@ -53,8 +53,8 @@ namespace ManagementEmployee.API.Controllers
         [Route("api/employee/{id}")]
         public async Task<IActionResult> UpdateEmployeeAsync(int id, [FromBody] EmployeeDTO employee)
         {
-            await _employeeService.UpdateEmployeeAsync(id, employee);
-            return Ok();
+           var response =  await _employeeService.UpdateEmployeeAsync(id, employee);
+            return Ok(response);
         }
 
         [HttpDelete]
@@ -62,8 +62,8 @@ namespace ManagementEmployee.API.Controllers
         [Route("api/employee/{id}")]
         public async Task<IActionResult> DeleteEmployeeAsync(int id)
         {
-            await _employeeService.DeleteEmployeeAsync(id);
-            return Ok();
+            var response =  await _employeeService.DeleteEmployeeAsync(id);
+            return Ok(response);
         }
 
         [HttpPost]
@@ -76,6 +76,10 @@ namespace ManagementEmployee.API.Controllers
                 return Unauthorized(response.Message);
             }
             var user = response.Data as Users;  // for role based authentication
+            if (user == null)
+            {
+                return Unauthorized("Invalid User data");
+            }
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes("!@%!@#$*&!@*#(7^#$(*&!@#$*^(!@#^$(*&!@#$(*&11234987+asjfl;aHFAJKD2139408-1==asdfjk;asd**&(*&asdfj;aklsjdflk;");
             var tokenDescriptor = new SecurityTokenDescriptor
