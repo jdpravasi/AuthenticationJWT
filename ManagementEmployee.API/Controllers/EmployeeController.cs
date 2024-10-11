@@ -73,13 +73,9 @@ namespace ManagementEmployee.API.Controllers
             var response = await _employeeService.Login(loginRequest.Email, loginRequest.Password);
             if (!response.Success)
             {
-                return Unauthorized(response.Message);
+                return Ok(response.Message);
             }
             var user = response.Data as Users;  // for role based authentication
-            if (user == null)
-            {
-                return Unauthorized("Invalid User data");
-            }
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes("!@%!@#$*&!@*#(7^#$(*&!@#$*^(!@#^$(*&!@#$(*&11234987+asjfl;aHFAJKD2139408-1==asdfjk;asd**&(*&asdfj;aklsjdflk;");
             var tokenDescriptor = new SecurityTokenDescriptor
